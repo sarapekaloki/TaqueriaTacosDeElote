@@ -7,7 +7,7 @@ class Taco():
         
     def setTime(self):
         for ingrediente in range(len(self.ingredientes)):
-            self.finishTime+=.5
+            self.finishTime=self.finishTime+.5
     
     
     
