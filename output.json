@@ -1,0 +1,33 @@
+{  
+   "datetime":"2017-01-01 23:23:23",
+   "request_id":"31750",
+   "status":"done",
+   "responseTime": 60s,
+   "orden":[  
+      {  
+         "part_id":"31751",
+         "type":"taco",
+         "meat":"asada",
+          "status":"done",
+         "quantity":3,
+         "ingredients":[  
+            "cebolla",
+            "salsa"
+         ]
+         "waitTime": 15s
+         "turnaroundTime": 6s
+         
+      },
+      {  
+         "part_id":"31752",
+         "type":"quesadilla",
+         "meat":"adobada",
+         "status":"done",
+         "quantity":1,
+         "ingredients":[  
+         ]
+         "waitTime": 15s
+         "turnaroundTime": 21s
+      }
+   ]
+}
