@@ -14,6 +14,7 @@ class Taquero():
         self.breakTime = 0
         self.resting=False
     
+    
     def setBreak(self,rest):
         self.resting=rest
     
