@@ -1,5 +1,5 @@
 class Taquero():
-    def __init__(self,name , carne1, queue1, queue2, carne2=None,):
+    def __init__(self,name , carne1, queue1, queue2, carne2=None):
         self.name = name
         self.carne1 = carne1
         self.carne2 = carne2
@@ -11,8 +11,13 @@ class Taquero():
         self.aguacateCount = 0
         self.queue1 = queue1
         self.queue2 = queue2
-        self.needsBreak = 0
-
+        self.breakTime = 0
+        self.resting=False
+    
+    def setBreak(self,rest):
+        self.resting=rest
+    
+        
 
 
 
