@@ -21,7 +21,7 @@ class Taquero():
         
     def makeTaco(self,taco):
         self.tacosCount += 1
-        self.tortillaCount += 1
+        self.tortillaCount += 1 if not taco.isQuesadilla
         self.breakTime += .03
         
         
