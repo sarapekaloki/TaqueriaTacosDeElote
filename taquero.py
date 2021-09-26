@@ -1,3 +1,4 @@
+from taco.py import Taco
 class Taquero():
     def __init__(self,name , carne1, queue1, queue2, carne2=None):
         self.name = name
@@ -17,6 +18,13 @@ class Taquero():
     
     def setBreak(self,rest):
         self.resting=rest
+        
+    def makeTaco(self,taco):
+        self.tacosCount += 1
+        self.tortillaCount += 1
+        self.breakTime += .03
+        
+        
     
         
 
