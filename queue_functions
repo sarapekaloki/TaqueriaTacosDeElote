@@ -5,7 +5,7 @@ import boto3
 import time
 sqs = boto3.client("sqs")
 queue_url= "https://sqs.us-east-1.amazonaws.com/292274580527/sqs_cc106_team_3"
-who = "Aczino"
+who = "kdesito"
 
 
 def read_message():
@@ -56,3 +56,47 @@ def write_message(mensaje, orden):
         QueueUrl = queue_url,
         MessageBody = (json.dumps(orden))
     )
+
+
+def generate_tacos(n):
+    type = ["taco", "quesadilla"]
+    meat = ["asada", "adobada", "suadero", "tripa", "cabeza"]
+    fillings = ["cebolla", "cilantro", "salsa", "guacamole"]
+    # Imprimire cuantas ordenes voy a meter
+    print(f" >>>>>>>>INSERTING {n} TACO ORDERS<<<<<<<<<<< ")
+    for x in range(n):
+        taco = {
+            "datetime": str(datetime.now()),
+            "request_id": x,
+            "status": "open",
+            "orden": []
+        }
+        for y in range(random.randint(1,2)):
+            taco["orden"].append(
+                {
+                    "part_id": "{0}-{1}".format(x, y),
+                    "type": random.choice(type),
+                    "meat": random.choice(meat),
+                    "status": "open",
+                    "quantity": random.randint(1,3),
+                    "ingredients": []
+                }
+            )
+            local_fillings = fillings.copy()
+            for z in range(random.randint(1,len(local_fillings))):
+                ind_filling = random.choice(local_fillings)
+                taco["orden"][y]["ingredients"].append(ind_filling)
+                local_fillings.remove(ind_filling)
+        print(taco)
+
+        sqs.send_message(QueueUrl=queue_url, MessageBody=(json.dumps(taco)))
+    print(f" >>>>>>>> INSERTED {n} TACO ORDERS<<<<<<<<<<< ")
+
+def purge():
+    sqs.purge_queue(QueueUrl=queue_url)
+
+def delete():
+    while (True):
+        var = read_and_delete()
+        if var == None:
+            break
