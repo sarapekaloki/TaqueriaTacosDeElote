@@ -1,0 +1,95 @@
+from queue_functions import read_message
+from Cocinero import *
+from queue import Queue
+
+
+
+
+# queue1 = Queue()
+# queue2 = Queue()
+# queue3 = Queue()
+# queue4 = Queue()
+# queue5 = Queue()
+# queue6 = Queue()
+# queuesadilla1 = Queue()
+# queuesadilla2 = Queue()
+#
+#
+# taquero1 = Cocinero(queue1, queue2, ['asada',None])
+# taquero2 = Cocinero(queue3, queue4, ['asada','suadero'])
+# taquero3 = Cocinero(queue3, queue4, ['asada','suadero'])
+# taquero4 = Cocinero(queue5, queue6, ['tripa','cabeza'])
+# quesadillero1 = Cocinero(queuesadilla1, queuesadilla2, ['quesadilla',None])
+
+#
+# orden = [
+#     {
+#         "part_id":"2-0",
+#         "type":"taco",
+#         "meat":"adobada",
+#         "quantity":10,
+#         "ingredientes":[]
+#     },
+#     {
+#         "part_id":"2-1",
+#         "type":"taco",
+#         "meat":"asada",
+#         "quantity":5,
+#         "ingredientes":[]
+#     },
+#     {
+#         "part_id": "2-1",
+#         "type": "quesadilla",
+#         "meat": "suadero",
+#         "quantity": 5,
+#         "ingredientes": []
+#     },
+#     {
+#         "part_id": "2-1",
+#         "type": "taco",
+#         "meat": "tripa",
+#         "quantity": 5,
+#         "ingredientes": []
+#     },
+#     {
+#         "part_id": "2-1",
+#         "type": "taco",
+#         "meat": "cabeza",
+#         "quantity": 5,
+#         "ingredientes": []
+#     }
+# ]
+
+# m, orden = read_message()
+
+def agregar_ordenes(cocineros):
+    cocineros_aux = cocineros.copy()
+    m, orden = read_message()
+    print(orden)
+    orden = orden['orden']
+    carnes = set()
+    queue_lengths=[]
+    for batch in orden:
+        if batch['status']=='open':
+            if batch['type']=='quesadilla':
+                carnes.add(batch['type'])
+            else:
+                carnes.add(batch['meat'])
+    print(f"Carnes: {carnes}")
+    for cocinero in cocineros_aux:
+        if cocinero.tipos[0] not in carnes and cocinero.tipos[1] not in carnes:
+            print('Cocinero que se va a eliminar: ',cocinero.tipos)
+            cocineros.remove(cocinero)
+    for cocinero in cocineros:
+        print(cocinero.tipos)
+        queue_lengths.append(cocinero.queue_1.qsize()+cocinero.queue_2.qsize())
+
+    max_length = min(queue_lengths)
+    winner = cocineros[queue_lengths.index(max_length)]
+    winner.queue_1.put(orden)
+    # print(winner.tipos)
+    # print(orden)
+
+# agregar_ordenes([taquero1,taquero2,taquero3,quesadillero1],orden)
+
+
