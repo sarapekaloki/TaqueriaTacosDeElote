@@ -1,0 +1,58 @@
+import random
+from datetime import datetime
+import json
+import boto3
+import time
+sqs = boto3.client("sqs")
+queue_url= "https://sqs.us-east-1.amazonaws.com/292274580527/sqs_cc106_team_3"
+who = "Aczino"
+
+
+def read_message():
+    response = sqs.receive_message(QueueUrl=queue_url)
+    if "Messages" not in response:
+        return ['','']
+    message = response['Messages']
+    # print(message)
+    orden = json.loads(message[0]["Body"])
+    # print("Atendiendo orden: {0}. Leyendo mensaje del queue. Tiempo pendiente {1}".format(orden["request_id"],orden["tiempo_pendiente"]))
+    # print(orden)
+    return message[0], orden
+
+def get_number_messages():
+    queue_attr = sqs.get_queue_attributes(
+        QueueUrl = queue_url,
+        AttributeNames = ['ApproximateNumberOfMessages'])
+    return int(queue_attr["Attributes"]["ApproximateNumberOfMessages"])
+
+
+def read_and_delete():
+    response = sqs.receive_message(QueueUrl=queue_url)
+    if "Messages" not in response:
+        return None
+    message = response['Messages']
+    sqs.delete_message(
+        QueueUrl=queue_url,
+        ReceiptHandle=message[0]["ReceiptHandle"]
+    )
+    print(f"Borrando mensaje: {message}")
+    return message
+
+def delete_message(message, orden, complete):
+    if complete:
+        orden["end_datetime"] = str(datetime.now().timestamp())
+        print("Orden {0} Terminada. Mensaje borrado del queue".format(orden["request_id"]))
+        print(orden)
+    else:
+        print("Orden {0} Pendiente. Regresando mensaje al queue. Tiempo pendiente {1}".format(orden["request_id"], orden["tiempo_pendiente"]))
+    sqs.delete_message(
+        QueueUrl = queue_url,
+        ReceiptHandle = message["ReceiptHandle"]
+    )
+
+def write_message(mensaje, orden):
+    delete_message(mensaje, orden, False)
+    response = sqs.send_message(
+        QueueUrl = queue_url,
+        MessageBody = (json.dumps(orden))
+    )
