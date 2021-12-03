@@ -1,0 +1,27 @@
+from queue_functions import *
+from queue import Queue
+
+
+class Cocinero():
+    def __init__(self,queue1, queue2, tipos):
+        self.queue_1 = queue1
+        self.queue_2 = queue2
+        self.tipos = tipos
+        self.fillings = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else {"salsa": 150, "guacamole": 100, "cilantro": 200, "cebolla": 200}
+        self.rest = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else 1000
+
+    def atender_orden(self):
+        queue = self.queue_1
+
+        if not queue.empty():
+            orden = queue.get()
+            for batch in orden:
+                if batch['status']=='open' and ((batch['meat'] == self.tipos[0] or batch['meat']==self.tipos[1]) or self.tipos[0]=='quesadilla'):
+                    # print('Ola?')
+                    print(orden)
+                    if batch['quantity'] < 5:
+                        batch['quantity'] = 0
+                        batch['status']='closed'
+                    print(orden)
+
+
