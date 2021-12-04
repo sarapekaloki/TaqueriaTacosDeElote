@@ -1,0 +1,61 @@
+from Cocinero import *
+from queue_functions import *
+from Mesero import agregar_ordenes
+from orders import  orders
+
+
+queue1 = Queue()
+queue2 = Queue()
+queue3 = Queue()
+queue4 = Queue()
+queue5 = Queue()
+queue6 = Queue()
+queuesadilla1 = Queue()
+queuesadilla2 = Queue()
+
+
+
+
+taquero1 = Cocinero(queue1, queue2, ['adobada',None])
+taquero2 = Cocinero(queue3, queue4, ['asada','suadero'])
+taquero3 = Cocinero(queue3, queue4, ['asada','suadero'])
+taquero4 = Cocinero(queue5, queue6, ['tripa','cabeza'])
+quesadillero = Cocinero(queuesadilla1, queuesadilla2, ['quesadilla',None])
+
+cocineros = [taquero1,taquero2,taquero3,taquero4, quesadillero]
+
+for order in orders:
+    taquero1.queue_1.put(order)
+
+
+
+# agregar_ordenes([taquero1,taquero2,taquero4,quesadillero])
+
+for i in range(20):
+    taquero1.atender_orden()
+
+    if taquero1.using_queue_1:
+        if not taquero1.queue_2.empty():
+            print('Cambiando hacia queue 2...\n\n')
+            taquero1.using_queue_1 = False
+    else:
+        taquero1.using_queue_1 = True
+    time.sleep(5)
+
+
+
+# taquero2.atender_orden()
+# taquero3.atender_orden()
+# taquero4.atender_orden()
+# quesadillero.atender_orden()
+# print(list(queue1.queue))
+# print(list(queue2.queue))
+# print(list(queue3.queue))
+# print(list(queue4.queue))
+# print(list(queue5.queue))
+# print(list(queue6.queue))
+# print(list(queuesadilla1.queue))
+# print(list(queuesadilla2.queue))
+
+
+
