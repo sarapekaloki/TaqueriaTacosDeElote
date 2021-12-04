@@ -4,24 +4,11 @@ orders = [[
     'type': 'taco',
     'meat': 'adobada',
     'status': 'open',
-    'quantity': 19,
+    'quantity': 14,
     'ingredients': [
       'cilantro',
       'salsa',
       'cebolla'
-    ]
-  },
-  {
-    'part_id': '4-1',
-    'type': 'taco',
-    'meat': 'adobada',
-    'status': 'open',
-    'quantity': 21,
-    'ingredients': [
-      'cebolla',
-      'guacamole',
-      'cilantro',
-      'salsa'
     ]
   }
 ],
@@ -39,20 +26,36 @@ orders = [[
       'salsa',
       'cebolla'
     ]
-  },
-  {
-    'part_id': '5-1',
-    'type': 'taco',
-    'meat': 'adobada',
-    'status': 'open',
-    'quantity': 21,
-    'ingredients': [
-      'cebolla',
-      'guacamole',
-      'cilantro',
-      'salsa'
-    ]
   }
-]]
+],
+  [
+    {
+      'part_id': '5-0',
+      'type': 'taco',
+      'meat': 'adobada',
+      'status': 'open',
+      'quantity': 5,
+      'ingredients': [
+        'cilantro',
+        'salsa',
+        'cebolla'
+      ]
+    }
+  ],
+  [
+    {
+      'part_id': '5-0',
+      'type': 'taco',
+      'meat': 'adobada',
+      'status': 'open',
+      'quantity': 18,
+      'ingredients': [
+        'cilantro',
+        'salsa',
+        'cebolla'
+      ]
+    }
+  ]
+]
 
 
