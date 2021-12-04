@@ -9,19 +9,54 @@ class Cocinero():
         self.tipos = tipos
         self.fillings = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else {"salsa": 150, "guacamole": 100, "cilantro": 200, "cebolla": 200}
         self.rest = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else 1000
+        self.using_queue_1 = True
 
     def atender_orden(self):
-        queue = self.queue_1
+        if self.using_queue_1:
+            queue = self.queue_1
+            num_queue = '1'
+        else:
+            queue = self.queue_2
+            num_queue = '2'
+
+
+        print("Queue que se esta usando: "+num_queue)
 
         if not queue.empty():
             orden = queue.get()
+            print('Orden: ',orden)
             for batch in orden:
                 if batch['status']=='open' and ((batch['meat'] == self.tipos[0] or batch['meat']==self.tipos[1]) or self.tipos[0]=='quesadilla'):
-                    # print('Ola?')
-                    print(orden)
-                    if batch['quantity'] < 5:
+                    print(f"Batch antes: {batch}")
+                    print(batch['ingredients'])
+                    if self.tipos[0] != 'quesadilla' or (batch['quantity'] < 0 and batch['type'] == 'quesadilla' and self.tipos[0] != 'quesadilla'):
+                        for ingredient in batch['ingredients']:
+                            self.fillings[ingredient]-=1
+
+
+
+                    if batch['quantity'] <= 5:
                         batch['quantity'] = 0
                         batch['status']='closed'
-                    print(orden)
+                        print("Fillings: ", self.fillings)
+                        print(f"Batch despues: {batch}")
+                        print('Batch terminado')
+
+
+
+
+
+                    elif batch['quantity']>5:
+                        if not (self.tipos != 'quesadilla' and batch['type']=='quesadilla'):
+                            batch['quantity']-=5
+                            self.queue_2.put(orden)
+                            print('Llevando a queue 2')
+                            print("Fillings: ", self.fillings)
+                            print(f"Batch despues: {batch}")
+
+
+                            return
+
+
 
 
