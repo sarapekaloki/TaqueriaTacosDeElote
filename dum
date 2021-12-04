@@ -13,9 +13,6 @@ queue6 = Queue()
 queuesadilla1 = Queue()
 queuesadilla2 = Queue()
 
-
-
-
 taquero1 = Cocinero(queue1, queue2, ['adobada',None])
 taquero2 = Cocinero(queue3, queue4, ['asada','suadero'])
 taquero3 = Cocinero(queue3, queue4, ['asada','suadero'])
@@ -43,8 +40,24 @@ for order in orders:
 #     time.sleep(5)
 
 while True:
-    taquero1.atender_orden()
-    time.sleep(5)
+    resultado_orden = taquero1.atender_orden()
+    cocineros_aux = cocineros.copy()
+    # print(len(cocineros_aux))
+    #Si el resultado_orden es diferente a None, eso significa que el mesero termino el batch, y regresa dos cosas:
+    #el taquero que termino el batch, y la orden a la que este batch pertenece. Entonces se vuelve a hacer la funcion
+    #de agregarle ordenes al queue con menos ordenes (Mesero), solo que excluyendo al taquero de la lista de cocineros.
+    #No se si esa parte este bien asi que chequen jaja salu2
+    if resultado_orden != None:
+        # print(len(cocineros_aux))
+        # print(resultado_orden[0])
+        #Se quita al cocinero que termino el batch de la lista de taqueros que se va a pasar como argumento de la funcion
+        cocineros_aux.remove(resultado_orden[0])
+        print(resultado_orden[1])
+        #Se hace la funcion con la lista de cocineros, y con la orden cuyo batch fue hecho por el mesero
+        agregar_ordenes(cocineros_aux, resultado_orden[1])
+        # print(len(cocineros_aux))
+
+    time.sleep(1)
 
 
 
