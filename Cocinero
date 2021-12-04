@@ -9,6 +9,7 @@ class Cocinero():
         self.queue_1 = queue1
         self.queue_2 = queue2
         self.tipos = tipos
+        self.fillings = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else {"salsa": 150, "guacamole": 100, "cilantro": 200, "cebolla": 200}
         self.rest = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else 100  # 3 s / 100
         self.fan = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else 60  # 6 s / 60
         self.using_queue_1 = True
