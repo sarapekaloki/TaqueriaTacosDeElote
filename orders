@@ -1,0 +1,58 @@
+[
+  {
+    'part_id': '4-0',
+    'type': 'taco',
+    'meat': 'adobada',
+    'status': 'open',
+    'quantity': 19,
+    'ingredients': [
+      'cilantro',
+      'salsa',
+      'cebolla'
+    ]
+  },
+  {
+    'part_id': '4-1',
+    'type': 'taco',
+    'meat': 'adobada',
+    'status': 'open',
+    'quantity': 21,
+    'ingredients': [
+      'cebolla',
+      'guacamole',
+      'cilantro',
+      'salsa'
+    ]
+  }
+]
+
+
+[
+  {
+    'part_id': '5-0',
+    'type': 'taco',
+    'meat': 'adobada',
+    'status': 'open',
+    'quantity': 19,
+    'ingredients': [
+      'cilantro',
+      'salsa',
+      'cebolla'
+    ]
+  },
+  {
+    'part_id': '5-1',
+    'type': 'taco',
+    'meat': 'adobada',
+    'status': 'open',
+    'quantity': 21,
+    'ingredients': [
+      'cebolla',
+      'guacamole',
+      'cilantro',
+      'salsa'
+    ]
+  }
+]
+
+
