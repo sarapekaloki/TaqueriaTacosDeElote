@@ -31,15 +31,19 @@ for order in orders:
 
 # agregar_ordenes([taquero1,taquero2,taquero4,quesadillero])
 
-for i in range(20):
-    taquero1.atender_orden()
+# for i in range(20):
+#     taquero1.atender_orden()
+#
+#     if taquero1.using_queue_1:
+#         if not taquero1.queue_2.empty():
+#             print('Cambiando hacia queue 2...\n\n')
+#             taquero1.using_queue_1 = False
+#     else:
+#         taquero1.using_queue_1 = True
+#     time.sleep(5)
 
-    if taquero1.using_queue_1:
-        if not taquero1.queue_2.empty():
-            print('Cambiando hacia queue 2...\n\n')
-            taquero1.using_queue_1 = False
-    else:
-        taquero1.using_queue_1 = True
+while True:
+    taquero1.atender_orden()
     time.sleep(5)
 
 
