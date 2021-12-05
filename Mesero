@@ -66,7 +66,7 @@ def agregar_ordenes(cocineros, ogOrden=None):
     cocineros_aux = cocineros.copy()
     if ogOrden == None:
         m,orden = read_message()
-        print(m)
+        print(m,"\n", type(orden),"\n", orden)
 
         #Borrar mensaje del sqs
         delete_message(m[0]['ReceiptHandle'])
@@ -108,5 +108,3 @@ def agregar_ordenes(cocineros, ogOrden=None):
     # print(orden)
 
 # agregar_ordenes([taquero1,taquero2,taquero3,quesadillero1],orden)
-
-
