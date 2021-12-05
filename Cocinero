@@ -24,7 +24,7 @@ class Cocinero():
         if self.rest <= 5:
             print('----Descansando alv----')
             time.sleep(3)
-            self.rest += 15
+            self.rest += 100
         self.rest -= rest_time
 
     def fan_time(self, fan_time):
@@ -35,14 +35,8 @@ class Cocinero():
             while time.time() - time1 < 6:
                 pass
             print(f"\t\t >>> Abanicamos {time.time() - time1} segundacos")
-            self.fan += 15
+            self.fan += 60
         self.fan -= fan_time
-
-    def check_filling(self, filling, quantity):
-        if quantity > filling:
-            print(f"taquero waiting for {filling}")
-            time.sleep(2)
-            self.check_filling(filling,quantity)
 
 
     def atender_orden(self):
@@ -58,29 +52,28 @@ class Cocinero():
 
         if not queue.empty():
             orden = queue.get()
-            print(f"Body >>> {orden}\nOrden >> {orden['orden']}")
+            orden['Answer']['start-time']= str(datetime.now())
             for batch in orden['orden']:
-                if batch['status'] == 'open' and (
-                        (batch['meat'] == self.tipos[0] or batch['meat'] == self.tipos[1]) or self.tipos[
-                    0] == 'quesadilla'):
+                if batch['status'] == 'open' and ((batch['meat'] == self.tipos[0] or batch['meat'] == self.tipos[1]) or self.tipos[0] == 'quesadilla'):
                     print(f"Batch antes: {batch}")
+                    part_id = batch['part_id']
                     # print(batch['ingredients'])
                     if batch['quantity'] <= 5:
                         self.check_rest(batch['quantity'])
                         fan_thread = Thread(target=self.fan_time, args=(batch['quantity'],))
                         fan_thread.start()
 
+                        orden['Answer']['steps'].append({"state":"running","action":"Doing tacos","part-id":part_id})
+
                         spent_fillings = int(batch['quantity'])
-
-
                         if self.tipos[0] != 'quesadilla' or (
                                 batch['quantity'] == 0 and batch['type'] == 'quesadilla' and self.tipos[
                             0] != 'quesadilla'):
                             for ingredient in batch['ingredients']:
-                                self.check_filling(self.fillings[ingredient],spent_fillings)
                                 self.fillings[ingredient] -= spent_fillings
                         batch['quantity'] = 0
                         batch['status'] = 'closed'
+                        orden['Answer']['steps'].append({"state": "Done", "action": "Batch completed", "part-id": part_id})
                         if self.using_queue_1:
                             self.using_queue_1 = False
 
@@ -91,7 +84,7 @@ class Cocinero():
                         # Se regresa al objeto, y la orden que se quiere enviar a otro cocinero. El objeto aqui se regresa porque se necesita
                         # referencia a el, ya que se va a excluir de la lista en la funcion de agregar_ordenes en dum.py. Esto solo se envia cuando
                         # se termino el batch. Aun falta la funcionalidad de que va a pasar cuando la orden este completamente terminada jajaja salu2
-                        return self, orden
+                        return orden
 
                     elif batch['quantity'] > 5:
                         self.check_rest(5)
@@ -103,10 +96,13 @@ class Cocinero():
                                     batch['quantity'] == 0 and batch['type'] == 'quesadilla' and self.tipos[
                                 0] != 'quesadilla'):
                                 for ingredient in batch['ingredients']:
-                                    self.check_filling(self.fillings[ingredient],5)
                                     self.fillings[ingredient] -= 5
                             batch['quantity'] -= 5
+
+                            orden['Answer']['steps'].append({"state": "Running", "action": "Doing tacos", "part-id": part_id})
                             self.queue_2.put(orden)
+                            orden['Answer']['steps'].append({"state": "Waiting", "action": "Waiting for taquero", "part-id": part_id})
+
                             self.using_queue_1 = not self.using_queue_1
                             print("Fillings: ", self.fillings)
                             print(f"Batch despues: {batch}")
