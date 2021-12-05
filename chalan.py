@@ -20,7 +20,7 @@ class Chalan():
     def fill_fillings(self):
         for taquero in self.taqueros:
             for filling in taquero.fillings:
-                if taquero.fillings[filling] <= 10:
+                if taquero.fillings[filling] <= 5:
 
                     # llenamos CILANTRO O CEBOLLA
                     if filling == "cilantro" or filling == "cebolla":
