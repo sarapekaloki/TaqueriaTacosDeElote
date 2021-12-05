@@ -1,4 +1,6 @@
-orders = [[
+from queue_functions import write_message
+from datetime import datetime
+orders = [{"datetime":str(datetime.now()),"request-id":4,"status":"open","orden":[
   {
     'part_id': '4-0',
     'type': 'taco',
@@ -10,52 +12,20 @@ orders = [[
       'salsa',
       'cebolla'
     ]
-  }
-],
-
-
-[
-  {
-    'part_id': '5-0',
+  },
+{
+    'part_id': '4-1',
     'type': 'taco',
     'meat': 'adobada',
     'status': 'open',
-    'quantity': 19,
+    'quantity': 14,
     'ingredients': [
       'cilantro',
       'salsa',
-      'cebolla'
     ]
   }
-],
-  [
-    {
-      'part_id': '5-0',
-      'type': 'taco',
-      'meat': 'adobada',
-      'status': 'open',
-      'quantity': 5,
-      'ingredients': [
-        'cilantro',
-        'salsa',
-        'cebolla'
-      ]
-    }
-  ],
-  [
-    {
-      'part_id': '5-0',
-      'type': 'taco',
-      'meat': 'adobada',
-      'status': 'open',
-      'quantity': 18,
-      'ingredients': [
-        'cilantro',
-        'salsa',
-        'cebolla'
-      ]
-    }
-  ]
-]
+]}]
+for i in range (10):
+  write_message(orders)
 
 
