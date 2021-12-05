@@ -1,4 +1,5 @@
-from Cocinero import *
+from Taquero import *
+from Quesadillero import Quesadillero
 from queue_functions import *
 from Mesero import agregar_ordenes
 
@@ -13,13 +14,14 @@ queue6 = Queue()
 queuesadilla1 = Queue()
 queuesadilla2 = Queue()
 
-taquero1 = Cocinero(queue1, queue2, ['adobada',None])
-taquero2 = Cocinero(queue3, queue4, ['asada','suadero'])
-taquero3 = Cocinero(queue3, queue4, ['asada','suadero'])
-taquero4 = Cocinero(queue5, queue6, ['tripa','cabeza'])
-quesadillero = Cocinero(queuesadilla1, queuesadilla2, ['quesadilla',None])
+taquero1 = Taquero(queue1, queue2, ['adobada',None])
+taquero2 = Taquero(queue3, queue4, ['asada','suadero'])
+taquero3 = Taquero(queue3, queue4, ['asada','suadero'])
+taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'])
+quesadillero = Quesadillero(queuesadilla1,queuesadilla2)
+#quesadillero = Cocinero(queuesadilla1, queuesadilla2, ['quesadilla',None])
 
-cocineros = [taquero1,taquero2,taquero3,taquero4, quesadillero]
+cocineros = [taquero1,taquero2,taquero3,taquero4,quesadillero]
 
 # for order in orders:
 #     taquero1.queue_1.put(order)
@@ -28,7 +30,7 @@ cocineros = [taquero1,taquero2,taquero3,taquero4, quesadillero]
 while True:
     cocineros_aux = cocineros.copy()
     agregar_ordenes(cocineros)
-    resultado_orden = taquero1.atender_orden()
+    resultado_orden = quesadillero.atender_orden()
     # #Si el resultado_orden es diferente a None, eso significa que el mesero termino el batch, y regresa dos cosas:
     # #el taquero que termino el batch, y la orden a la que este ![](../../../../../../../../var/folders/7f/x1yj7wxx0lj1rgts9jxzdfpw0000gn/T/TemporaryItems/NSIRD_screencaptureui_OGcA6z/Screen Shot 2021-12-04 at 15.38.54.png)batch pertenece. Entonces se vuelve a hacer la funcion
     # #de agregarle ordenes al queue con menos ordenes (Mesero), solo que excluyendo al taquero de la lista de cocineros.
