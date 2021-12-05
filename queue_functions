@@ -5,7 +5,7 @@ import boto3
 import time
 sqs = boto3.client("sqs")
 queue_url= "https://sqs.us-east-1.amazonaws.com/292274580527/sqs_cc106_team_3"
-who = "kdesito"
+who = "Aczino"
 
 
 def read_message():
@@ -17,7 +17,7 @@ def read_message():
     orden = json.loads(message[0]["Body"])
     # print("Atendiendo orden: {0}. Leyendo mensaje del queue. Tiempo pendiente {1}".format(orden["request_id"],orden["tiempo_pendiente"]))
     # print(orden)
-    return message[0], orden
+    return message,orden
 
 def get_number_messages():
     queue_attr = sqs.get_queue_attributes(
@@ -38,26 +38,37 @@ def read_and_delete():
     print(f"Borrando mensaje: {message}")
     return message
 
-def delete_message(message, orden, complete):
-    if complete:
-        orden["end_datetime"] = str(datetime.now().timestamp())
-        print("Orden {0} Terminada. Mensaje borrado del queue".format(orden["request_id"]))
-        print(orden)
-    else:
-        print("Orden {0} Pendiente. Regresando mensaje al queue. Tiempo pendiente {1}".format(orden["request_id"], orden["tiempo_pendiente"]))
-    sqs.delete_message(
-        QueueUrl = queue_url,
-        ReceiptHandle = message["ReceiptHandle"]
-    )
+def delete_message(receiptHdl):
+    #print('Borrando {0}'.format(receiptHdl))
+    sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=receiptHdl)
 
-def write_message(mensaje, orden):
-    delete_message(mensaje, orden, False)
+
+    # if complete:
+    #     orden["end_datetime"] = str(datetime.now().timestamp())
+    #     print("Orden {0} Terminada. Mensaje borrado del queue".format(orden["request_id"]))
+    #     print(orden)
+    # else:
+    #     print("Orden {0} Pendiente. Regresando mensaje al queue. Tiempo pendiente {1}".format(orden["request_id"], orden["tiempo_pendiente"]))
+    # sqs.delete_message(
+    #     QueueUrl = queue_url,
+    #     ReceiptHandle = message["ReceiptHandle"]
+    # )
+
+def write_message(orden):
     response = sqs.send_message(
         QueueUrl = queue_url,
         MessageBody = (json.dumps(orden))
     )
 
 
+def purge():
+    sqs.purge_queue(QueueUrl=queue_url)
+
+def delete():
+    while (True):
+        var = read_and_delete()
+        if var == None:
+            break
 def generate_tacos(n):
     type = ["taco", "quesadilla"]
     meat = ["asada", "adobada", "suadero", "tripa", "cabeza"]
@@ -71,14 +82,14 @@ def generate_tacos(n):
             "status": "open",
             "orden": []
         }
-        for y in range(random.randint(1,2)):
+        for y in range(random.randint(5,10)):
             taco["orden"].append(
                 {
                     "part_id": "{0}-{1}".format(x, y),
                     "type": random.choice(type),
                     "meat": random.choice(meat),
                     "status": "open",
-                    "quantity": random.randint(1,3),
+                    "quantity": random.randint(15,30),
                     "ingredients": []
                 }
             )
@@ -91,12 +102,3 @@ def generate_tacos(n):
 
         sqs.send_message(QueueUrl=queue_url, MessageBody=(json.dumps(taco)))
     print(f" >>>>>>>> INSERTED {n} TACO ORDERS<<<<<<<<<<< ")
-
-def purge():
-    sqs.purge_queue(QueueUrl=queue_url)
-
-def delete():
-    while (True):
-        var = read_and_delete()
-        if var == None:
-            break
