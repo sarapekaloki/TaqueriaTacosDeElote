@@ -1,62 +1,4 @@
-# orders = [[
-#   {
-#     'part_id': '4-0',
-#     'type': 'taco',
-#     'meat': 'adobada',
-#     'status': 'open',
-#     'quantity': 14,
-#     'ingredients': [
-#       'cilantro',
-#       'salsa',
-#       'cebolla'
-#     ]
-#   }
-# ],
-#
-#
-# [
-#   {
-#     'part_id': '5-0',
-#     'type': 'taco',
-#     'meat': 'adobada',
-#     'status': 'open',
-#     'quantity': 19,
-#     'ingredients': [
-#       'cilantro',
-#       'salsa',
-#       'cebolla'
-#     ]
-#   }
-# ],
-#   [
-#     {
-#       'part_id': '5-0',
-#       'type': 'taco',
-#       'meat': 'adobada',
-#       'status': 'open',
-#       'quantity': 5,
-#       'ingredients': [
-#         'cilantro',
-#         'salsa',
-#         'cebolla'
-#       ]
-#     }
-#   ],
-#   [
-#     {
-#       'part_id': '5-0',
-#       'type': 'taco',
-#       'meat': 'adobada',
-#       'status': 'open',
-#       'quantity': 18,
-#       'ingredients': [
-#         'cilantro',
-#         'salsa',
-#         'cebolla'
-#       ]
-#     }
-#   ]
-# ]
+
 from queue_functions import *
 from datetime import datetime
 def orden(id,id1,id2):
@@ -66,27 +8,20 @@ def orden(id,id1,id2):
         'type': 'taco',
         'meat': 'adobada',
         'status': 'open',
-        'quantity': 14,
-        'ingredients': [
-          'cilantro',
-          'salsa',
-          'cebolla'
-        ]
+        'quantity': 10,
+        'ingredients': ["salsa", "cebolla", "cilantro"]
       },
-    {
-        'part_id': id2,
-        'type': 'taco',
-        'meat': 'adobada',
-        'status': 'open',
-        'quantity': 14,
-        'ingredients': [
-          'cilantro',
-          'salsa',
-        ]
-      }
+        {
+            'part_id': id2,
+            'type': 'taco',
+            'meat': 'asada',
+            'status': 'open',
+            'quantity': 10,
+            'ingredients': ["salsa", "cebolla", "cilantro"]
+        }
     ]}
     return orders
 # purge()
-for i in range (50):
+for i in range (20):
     order = orden(i,(str(i)+'-0'),(str(i)+'-1'))
     write_message(order)
