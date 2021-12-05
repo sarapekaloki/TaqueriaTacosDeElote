@@ -38,6 +38,12 @@ class Cocinero():
             self.fan += 15
         self.fan -= fan_time
 
+    def check_filling(self, filling, quantity):
+        if quantity > filling:
+            print(f"taquero waiting for {filling}")
+            time.sleep(2)
+            self.check_filling(filling,quantity)
+
 
     def atender_orden(self):
         spent_fillings = 0
@@ -65,10 +71,13 @@ class Cocinero():
                         fan_thread.start()
 
                         spent_fillings = int(batch['quantity'])
+
+
                         if self.tipos[0] != 'quesadilla' or (
                                 batch['quantity'] == 0 and batch['type'] == 'quesadilla' and self.tipos[
                             0] != 'quesadilla'):
                             for ingredient in batch['ingredients']:
+                                self.check_filling(self.fillings[ingredient],spent_fillings)
                                 self.fillings[ingredient] -= spent_fillings
                         batch['quantity'] = 0
                         batch['status'] = 'closed'
@@ -94,6 +103,7 @@ class Cocinero():
                                     batch['quantity'] == 0 and batch['type'] == 'quesadilla' and self.tipos[
                                 0] != 'quesadilla'):
                                 for ingredient in batch['ingredients']:
+                                    self.check_filling(self.fillings[ingredient],5)
                                     self.fillings[ingredient] -= 5
                             batch['quantity'] -= 5
                             self.queue_2.put(orden)
