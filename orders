@@ -1,31 +1,92 @@
-from queue_functions import write_message
+# orders = [[
+#   {
+#     'part_id': '4-0',
+#     'type': 'taco',
+#     'meat': 'adobada',
+#     'status': 'open',
+#     'quantity': 14,
+#     'ingredients': [
+#       'cilantro',
+#       'salsa',
+#       'cebolla'
+#     ]
+#   }
+# ],
+#
+#
+# [
+#   {
+#     'part_id': '5-0',
+#     'type': 'taco',
+#     'meat': 'adobada',
+#     'status': 'open',
+#     'quantity': 19,
+#     'ingredients': [
+#       'cilantro',
+#       'salsa',
+#       'cebolla'
+#     ]
+#   }
+# ],
+#   [
+#     {
+#       'part_id': '5-0',
+#       'type': 'taco',
+#       'meat': 'adobada',
+#       'status': 'open',
+#       'quantity': 5,
+#       'ingredients': [
+#         'cilantro',
+#         'salsa',
+#         'cebolla'
+#       ]
+#     }
+#   ],
+#   [
+#     {
+#       'part_id': '5-0',
+#       'type': 'taco',
+#       'meat': 'adobada',
+#       'status': 'open',
+#       'quantity': 18,
+#       'ingredients': [
+#         'cilantro',
+#         'salsa',
+#         'cebolla'
+#       ]
+#     }
+#   ]
+# ]
+from queue_functions import *
 from datetime import datetime
-orders = [{"datetime":str(datetime.now()),"request-id":4,"status":"open","orden":[
-  {
-    'part_id': '4-0',
-    'type': 'taco',
-    'meat': 'adobada',
-    'status': 'open',
-    'quantity': 14,
-    'ingredients': [
-      'cilantro',
-      'salsa',
-      'cebolla'
-    ]
-  },
-{
-    'part_id': '4-1',
-    'type': 'taco',
-    'meat': 'adobada',
-    'status': 'open',
-    'quantity': 14,
-    'ingredients': [
-      'cilantro',
-      'salsa',
-    ]
-  }
-]}]
-for i in range (10):
-  write_message(orders)
-
-
+def orden(id,id1,id2):
+    orders = {"datetime":str(datetime.now()),"request-id":id,"status":"open","orden":[
+      {
+        'part_id': id1,
+        'type': 'taco',
+        'meat': 'adobada',
+        'status': 'open',
+        'quantity': 14,
+        'ingredients': [
+          'cilantro',
+          'salsa',
+          'cebolla'
+        ]
+      },
+    {
+        'part_id': id2,
+        'type': 'taco',
+        'meat': 'adobada',
+        'status': 'open',
+        'quantity': 14,
+        'ingredients': [
+          'cilantro',
+          'salsa',
+        ]
+      }
+    ]}
+    return orders
+# purge()
+for i in range (50):
+    order = orden(i,(str(i)+'-0'),(str(i)+'-1'))
+    write_message(order)
