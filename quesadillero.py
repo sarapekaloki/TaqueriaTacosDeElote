@@ -2,25 +2,23 @@ from queue_functions import *
 from threading import Thread
 from queue import Queue
 
-
-# from Mesero import agregar_ordenes
 class Quesadillero():
     def __init__(self, queue1, queue2):
         self.queue_1 = queue1
         self.queue_2 = queue2
         self.using_queue_1 = True
+        self.tipos = [None,None]
 
     def atender_orden(self):
         if self.using_queue_1:
             queue = self.queue_1
             num_queue = '1'
-        elif not self.using_queue_1 and not self.queue_2.empty():
+        elif not self.using_queue_1:
             queue = self.queue_2
             num_queue = '2'
 
-        print("\n\nQueue de quesadillero que se esta usando: {0} ".format(num_queue))
-
         if not queue.empty():
+            print("\n\nQueue de quesadillero que se esta usando: {0} ".format(num_queue))
             orden = queue.get()
             orden['Answer']['start-time']= str(datetime.now())
             for batch in orden['orden']:
@@ -32,21 +30,30 @@ class Quesadillero():
                         sleepTime=0
                         orden['Answer']['steps'].append({"state":"running","action":"Doing quesadillas","part-id":part_id})
                         sleepTime= batch['quantity']*2
+                        batch['quantity2'] += batch['quantity']
+                        batch['quantity'] = 0
                         #Checar si tiene carne pues la orden no esta terminada
                         if batch['meat']!="" or len(batch['ingredients'])!=0:
                             batch['type']="quesataco"
+                            batch['quantity'] = batch['quantity2']
+                            batch.pop('quantity2')
+                            if batch['meat']=="":
+                                # batch['meat']='adobada'
+                                batch['meat']= random.choice(['adobada','asada','suadero','tripa','cabeza'])
                             print("AHORA ES QUESATACO")
+                        else:
+                            batch['status'] = 'closed'
 
-                        batch['quantity2']+=batch['quantity']
-                        batch['quantity'] = 0
+
                         # batch.pop('quantity2')
                         time.sleep(sleepTime)
-                        batch['status'] = 'closed'
+
                         orden['Answer']['steps'].append({"state": "Done", "action": "Batch completed", "part-id": part_id})
                         if self.using_queue_1:
                             self.using_queue_1 = False
                         print(f"Batch despues: {batch}")
                         print('\t\t >>> Batch de quesadillas terminado')
+
                         return orden
 
                     elif batch['quantity'] > 5:
@@ -62,7 +69,4 @@ class Quesadillero():
                         print(f"Batch despues: {batch}")
                         return
         else:
-            print("El queue esta vacio alaverga")
-
-            # Agregar descanso qui vacio
             return
