@@ -61,26 +61,31 @@ from queue import Queue
 # ]
 
 # m, orden = read_message()
+
 def agregar_ordenes(cocineros, ogOrden=None):
     cocineros_aux = cocineros.copy()
-    for i in cocineros_aux:
-        print(i.tipos)
     if ogOrden == None:
-        m, orden = read_message()
-        orden = orden['orden']
+        m,orden = read_message()
+        print(m)
+
+        #Borrar mensaje del sqs
+        delete_message(m[0]['ReceiptHandle'])
+        # Agregar seccion answer
+        orden['Answer']=[]
     else:
         orden = ogOrden
-    # print(orden)
+    print(orden)
 
     carnes = set()
     queue_lengths=[]
-    for batch in orden:
+
+    for batch in orden['orden']:
         if batch['status']=='open':
             if batch['type']=='quesadilla':
                 carnes.add(batch['type'])
             else:
                 carnes.add(batch['meat'])
-    # print(f"Carnes: {carnes}")
+    print("CARNES ALV:", carnes)
     for cocinero in cocineros_aux:
         if cocinero.tipos[0] not in carnes and cocinero.tipos[1] not in carnes:
             # print('Cocinero que se va a eliminar: ',cocinero.tipos)
@@ -92,13 +97,16 @@ def agregar_ordenes(cocineros, ogOrden=None):
     #Aqui, si queue_lengths es 0 es porque ya se termino la orden, porque ningun cocinero tuvo un tipo de carne que existiera en la orden. Ahi a ver que
     #se les ocurre hacer con esto. Y chequen que la funcionalidad de pasar entre queues si funcione
     if len(queue_lengths) <= 0:
+
         print('Ya se termino la orden FELICIDADES ACABAS DE GANAR UN IPAD!!!')
         return
     max_length = min(queue_lengths)
     winner = cocineros[queue_lengths.index(max_length)]
+
     winner.queue_1.put(orden)
     print(winner.tipos)
     # print(orden)
+
 # agregar_ordenes([taquero1,taquero2,taquero3,quesadillero1],orden)
 
 
