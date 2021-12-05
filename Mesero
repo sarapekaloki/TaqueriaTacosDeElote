@@ -1,5 +1,6 @@
 from queue_functions import read_message
-from Cocinero import *
+from Taquero import *
+from Quesadillero import Quesadillero
 from queue import Queue
 
 
@@ -62,12 +63,19 @@ from queue import Queue
 
 # m, orden = read_message()
 
-def agregar_ordenes(cocineros, ogOrden=None):
-    cocineros_aux = cocineros.copy()
+def agregar_ordenes(taqueros, ogOrden=None):
+    taqueros_aux = taqueros.copy()
     if ogOrden == None:
         m,orden = read_message()
-        #Borrar mensaje del sqs
+        cantidad=0
+        # Borrar mensaje del sqs
         delete_message(m[0]['ReceiptHandle'])
+        #Si llegan 300 o mas tacos no se atendera orden
+        for batch in orden['orden']:
+            cantidad+=batch['quantity']
+            if cantidad >= 300:
+                print("Orden rechazada ")
+                return
         # Agregar seccion answer
         orden['Answer']={'start-time':"","end_time":"","steps":[]}
     else:
@@ -75,20 +83,22 @@ def agregar_ordenes(cocineros, ogOrden=None):
 
     carnes = set()
     queue_lengths=[]
-
     for batch in orden['orden']:
         if batch['status']=='open':
             if batch['type']=='quesadilla':
                 carnes.add(batch['type'])
+                batch["quantity2"]=0
             else:
                 carnes.add(batch['meat'])
-    for cocinero in cocineros_aux:
-        if cocinero.tipos[0] not in carnes and cocinero.tipos[1] not in carnes:
-            # print('Cocinero que se va a eliminar: ',cocinero.tipos)
-            cocineros.remove(cocinero)
-    for cocinero in cocineros:
-        # print(cocinero.tipos)
-        queue_lengths.append(cocinero.queue_1.qsize()+cocinero.queue_2.qsize())
+
+    for taquero in taqueros_aux:
+        if isinstance(taquero, Quesadillero) and 'quesadilla' not in carnes:
+            taqueros.remove(taquero)
+        if not isinstance(taquero,Quesadillero):
+            if taquero.tipos[0] not in carnes and taquero.tipos[1] not in carnes:
+                taqueros.remove(taquero)
+    for taquero in taqueros:
+        queue_lengths.append(taquero.queue_1.qsize()+taquero.queue_2.qsize())
 
     #Aqui, si queue_lengths es 0 es porque ya se termino la orden, porque ningun cocinero tuvo un tipo de carne que existiera en la orden. Ahi a ver que
     #se les ocurre hacer con esto. Y chequen que la funcionalidad de pasar entre queues si funcione
@@ -97,9 +107,9 @@ def agregar_ordenes(cocineros, ogOrden=None):
         print('ORDEN TERMINADA')
         print(orden)
         return
-    max_length = min(queue_lengths)
-    winner = cocineros[queue_lengths.index(max_length)]
 
+    max_length = min(queue_lengths)
+    winner = taqueros[queue_lengths.index(max_length)]
     winner.queue_1.put(orden)
     # print(orden)
 
