@@ -55,6 +55,3 @@ while True:
 # print(list(queue6.queue))
 # print(list(queuesadilla1.queue))
 # print(list(queuesadilla2.queue))
-
-
-
