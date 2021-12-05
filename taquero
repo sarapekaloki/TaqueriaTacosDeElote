@@ -6,17 +6,14 @@ from queue import Queue
 # from Mesero import agregar_ordenes
 
 
-class Cocinero():
+class Taquero():
     def __init__(self, queue1, queue2, tipos):
         self.queue_1 = queue1
         self.queue_2 = queue2
         self.tipos = tipos
-        self.fillings = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else {"salsa": 150,
-                                                                                                     "guacamole": 100,
-                                                                                                     "cilantro": 200,
-                                                                                                     "cebolla": 200}
-        self.rest = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else 100  # 3 s / 100
-        self.fan = None if self.tipos[0] == 'quesadilla' or self.tipos[1] == 'quesadilla' else 60  # 6 s / 60
+        self.fillings = {"salsa": 150, "guacamole": 100,"cilantro": 200,"cebolla": 200}
+        self.rest =100  # 3 s / 100
+        self.fan =60  # 6 s / 60
         self.using_queue_1 = True
 
     def check_rest(self, rest_time):
@@ -48,30 +45,29 @@ class Cocinero():
             queue = self.queue_2
             num_queue = '2'
 
-        print("\n\nQueue que se esta usando: " + num_queue)
+        print("\n\nQueue de {0} que se esta usando: {1} ".format(self.tipos ,num_queue))
 
         if not queue.empty():
             orden = queue.get()
             orden['Answer']['start-time']= str(datetime.now())
             for batch in orden['orden']:
-                if batch['status'] == 'open' and ((batch['meat'] == self.tipos[0] or batch['meat'] == self.tipos[1]) or self.tipos[0] == 'quesadilla'):
+                if batch['status'] == 'open' and (batch['meat'] == self.tipos[0] or batch['meat'] == self.tipos[1]):
                     print(f"Batch antes: {batch}")
                     part_id = batch['part_id']
                     # print(batch['ingredients'])
                     if batch['quantity'] <= 5:
+                        sleepTime=0
                         self.check_rest(batch['quantity'])
                         fan_thread = Thread(target=self.fan_time, args=(batch['quantity'],))
                         fan_thread.start()
-
                         orden['Answer']['steps'].append({"state":"running","action":"Doing tacos","part-id":part_id})
-
                         spent_fillings = int(batch['quantity'])
-                        if self.tipos[0] != 'quesadilla' or (
-                                batch['quantity'] == 0 and batch['type'] == 'quesadilla' and self.tipos[
-                            0] != 'quesadilla'):
-                            for ingredient in batch['ingredients']:
-                                self.fillings[ingredient] -= spent_fillings
+                        for ingredient in batch['ingredients']:
+                            sleepTime+=0.5*batch['quantity']
+                            self.fillings[ingredient] -= spent_fillings
+                        sleepTime += batch['quantity']
                         batch['quantity'] = 0
+                        time.sleep(sleepTime)
                         batch['status'] = 'closed'
                         orden['Answer']['steps'].append({"state": "Done", "action": "Batch completed", "part-id": part_id})
                         if self.using_queue_1:
@@ -87,26 +83,24 @@ class Cocinero():
                         return orden
 
                     elif batch['quantity'] > 5:
+                        sleepTime=0
                         self.check_rest(5)
                         fan_thread = Thread(target=self.fan_time, args=(5,))
                         fan_thread.start()
+                        for ingredient in batch['ingredients']:
+                            self.fillings[ingredient] -= 5
+                            sleepTime+=0.5*5
+                        sleepTime+=5
+                        batch['quantity'] -= 5
+                        time.sleep(5)
 
-                        if not (self.tipos != 'quesadilla' and batch['type'] == 'quesadilla'):
-                            if self.tipos[0] != 'quesadilla' or (
-                                    batch['quantity'] == 0 and batch['type'] == 'quesadilla' and self.tipos[
-                                0] != 'quesadilla'):
-                                for ingredient in batch['ingredients']:
-                                    self.fillings[ingredient] -= 5
-                            batch['quantity'] -= 5
-
-                            orden['Answer']['steps'].append({"state": "Running", "action": "Doing tacos", "part-id": part_id})
-                            self.queue_2.put(orden)
-                            orden['Answer']['steps'].append({"state": "Waiting", "action": "Waiting for taquero", "part-id": part_id})
-
-                            self.using_queue_1 = not self.using_queue_1
-                            print("Fillings: ", self.fillings)
-                            print(f"Batch despues: {batch}")
-                            return
+                        orden['Answer']['steps'].append({"state": "Running", "action": "Doing tacos", "part-id": part_id})
+                        self.queue_2.put(orden)
+                        orden['Answer']['steps'].append({"state": "Waiting", "action": "Waiting for taquero", "part-id": part_id})
+                        self.using_queue_1 = not self.using_queue_1
+                        print("Fillings: ", self.fillings)
+                        print(f"Batch despues: {batch}")
+                        return
         else:
             print("El queue esta vacio alaverga")
 
