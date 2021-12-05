@@ -1,7 +1,7 @@
 from Cocinero import *
 from queue_functions import *
 from Mesero import agregar_ordenes
-from orders import  orders
+
 
 
 queue1 = Queue()
@@ -21,8 +21,8 @@ quesadillero = Cocinero(queuesadilla1, queuesadilla2, ['quesadilla',None])
 
 cocineros = [taquero1,taquero2,taquero3,taquero4, quesadillero]
 
-for order in orders:
-    taquero1.queue_1.put(order)
+# for order in orders:
+#     taquero1.queue_1.put(order)
 
 
 while True:
@@ -35,10 +35,8 @@ while True:
     # #No se si esa parte este bien asi que chequen jaja salu2
     if resultado_orden != None:
         #Se quita al cocinero que termino el batch de la lista de taqueros que se va a pasar como argumento de la funcion
-        # cocineros_aux.remove(resultado_orden[0])
-        print(resultado_orden[1])
         #Se hace la funcion con la lista de cocineros, y con la orden cuyo batch fue hecho por el mesero
-        agregar_ordenes(cocineros_aux, resultado_orden[1])
+        agregar_ordenes(cocineros,resultado_orden)
     time.sleep(1)
 
 
