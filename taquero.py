@@ -32,21 +32,16 @@ class Taquero():
             self.mutex.release()
 
     def check_rest(self, rest_time):
-        print(f"Tiempo restante al descanso = {self.rest}\n")
         if self.rest <= 5:
-            print(f'----{self} esta descansando alv----')
             time.sleep(3)
             self.rest += 100
         self.rest -= rest_time
 
     def fan_time(self, fan_time):
-        print(f"Tiempo del abanico = {self.fan}\n")
         if self.fan <= 5:
-            print("\t > Prendimos abanico")
             time1 = time.time()
             while time.time() - time1 < 6:
                 pass
-            print(f"\t\t >>> Abanicamos {time.time() - time1} segundacos")
             self.fan += 60
         self.fan -= fan_time
 
@@ -72,19 +67,14 @@ class Taquero():
             # se calcula el tiempo desde la ultima vez que hizo algo
             # time2 = time.time()
 
-
-            print("\n\nQueue de {0} que se esta usando: {1} ".format(self.tipos, num_queue))
             orden = queue.get()
-            orden['Answer']['start-time']= str(datetime.now())
             for batch in orden['orden']:
                 if batch['status'] == 'open' and (batch['meat'] == self.tipos[0] or batch['meat'] == self.tipos[1]):
-                    print(f"Batch antes: {batch}")
                     part_id = batch['part_id']
                     # print(batch['ingredients'])
 
                     # El batch es MENOS O IGUAL a 5 tacos
                     if batch['quantity'] <= 5:
-
                         # Empezamos un contador de sleep time que es lo que r=tardara en ppreparar el batch de tacos
                         sleepTime=0
                         # revisamos el timepo que falta al taquero para descansar, y si llega a cero, se descansa
@@ -122,10 +112,7 @@ class Taquero():
                         if self.using_queue_1:
                             self.using_queue_1 = False
 
-                        print("Fillings: ", self.fillings)
-                        print(f"Batch despues: {batch}")
-                        print('\t\t >>> Batch terminado')
-
+    
                         # Se regresa al objeto, y la orden que se quiere enviar a otro cocinero. El objeto aqui se regresa porque se necesita
                         # referencia a el, ya que se va a excluir de la lista en la funcion de agregar_ordenes en dum.py. Esto solo se envia cuando
                         # se termino el batch. Aun falta la funcionalidad de que va a pasar cuando la orden este completamente terminada jajaja salu2
@@ -164,12 +151,10 @@ class Taquero():
                         self.queue_2.put(orden)
                         orden['Answer']['steps'].append({"state": "Waiting", "action": "Waiting for taquero", "part-id": part_id})
                         self.using_queue_1 = not self.using_queue_1
-                        print("Fillings: ", self.fillings)
-                        print(f"Batch despues: {batch}")
+                        
                         return
         else:
             # tiempo = 0
             # time1 = time.time()
             # Agregar descanso qui vacio
-            print("Queue vacio")
             return
