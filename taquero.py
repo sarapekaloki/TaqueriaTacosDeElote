@@ -32,7 +32,7 @@ class Taquero():
 
     def check_rest(self, rest_time):
         if self.rest <= 5:
-            print(f"{self} esta descansando ALV")
+            print(f"{self} esta descansando")
             time.sleep(3)
             self.rest += 100
         self.rest -= rest_time
