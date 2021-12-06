@@ -1,12 +1,12 @@
 import threading
+
 from queue_functions import *
 from queue import Queue
-from Taquero import Taquero
-from Quesadillero import Quesadillero
-from os import system as sys
+from taquero_Hugo import Taquero
+from quesadillero import Quesadillero
 from threading import Thread
 from chalan import Chalan
-
+from multiprocessing import Process
 
 
 class Taqueria():
@@ -16,44 +16,68 @@ class Taqueria():
         self.taquero3 = taquero3
         self.taquero4 = taquero4
         self.quesadillero = quesadillero
+        self.chalanes = None
         self.taqueros = [self.taquero1,self.taquero2,self.taquero3,self.taquero4]
 
-        self.ordenesPendientes = 0
-        self.ordenesTerminadas = 0
-        self.chalan1Info = "OFF"
-        self.chalan2Info = "OFF"
-        # num orden, descanso, ventilador, tortillas, ingredientes (agua, cebolla,cilantro,salsa),queue
-        self.taquero1Info = [0, "OFF", "OFF", 50, [100, 200, 200, 150], 1]
-        self.taquero2Info = [0, "OFF", "OFF", 50, [100, 200, 200, 150], 1]
-        self.taquero3Info = [0, "OFF", "OFF", 50, [100, 200, 200, 150], 1]
-        self.taquero4Info = [0, "OFF", "OFF", 50, [100, 200, 200, 150], 1]
-        self.quesadilleroInfo = [0, 0]
+    def elegir_orden_del_taquero(self, taquero):
+        print('Eligiendo...')
 
-        # start end steps requestid subordenes status
-        self.output = [0, 0, 0, 0, 0, 0]
+        if taquero.using_queue_1:
+            if taquero.queue_1.empty():
+                return None
+            # print(taquero1.queue_1.get())
+            return taquero.queue_1.get()
+        else:
+            if taquero.queue_2.empty():
+                return None
+            return taquero.queue_2.get()
 
     def run(self):
+        lista = []
+        for i in self.taqueros:
+            lista.append(i)
+        lista.append(self.quesadillero)
+
         # t1,t2 = self.threads()
         # t1.start()
         # t2.start()
         while True:
-            self.agregar_ordenes()
-            self.print()
+            t1 = Thread(target=self.agregar_ordenes)
+            t2 = Thread(target=self.agregar_ordenes)
+            t1.start()
+            t2.start()
+            t1.join()
+            t2.join()
 
-            r1 = self.taquero1.atender_orden()
-            r2 = self.taquero2.atender_orden()
-            if r1 != None:
-                self.agregar_ordenes(r1)
-            if r2 != None:
-                self.agregar_ordenes(r2)
+            print("Queue 1: ",list(taquero1.queue_1.queue))
+            print("Queue 2: ",list(taquero1.queue_2.queue))
+            orden1 = self.elegir_orden_del_taquero(taquero1)
+            orden2 = self.elegir_orden_del_taquero(taquero2)
+            print('Orden 1: ',orden1)
+            print('Orden 2: ', orden2)
 
+            # self.elegir_queue_del_taquero(taquero1)
+            # self.elegir_queue_del_taquero(taquero2)
+            # r1 = self.taquero1.atender_orden(orden1)
+            # r2 = self.taquero2.atender_orden(orden2)
+            r1 = Thread(target=taquero1.atender_orden, args=(orden1,))
+            r2 = Thread(target=taquero2.atender_orden, args=(orden2,))
+
+            r1.start()
+            r2.start()
+            r1.join()
+            r2.join()
+
+            if orden1['status'] == 'open':
+                self.agregar_ordenes(orden1)
+            if orden2['status'] == 'open':
+                self.agregar_ordenes(orden2)
 
 
     def threads(self):
         thread1 = Thread(target=self.taquero1.atender_orden,args=(self.taqueros,self.quesadillero,))
         thread2 = Thread(target=self.taquero2.atender_orden,args=(self.taqueros,self.quesadillero,))
         return thread1,thread2
-
     def agregar_ordenes(self,ogOrden=None):
         taqueros_aux = self.taqueros.copy()
         taqueros_aux2 = self.taqueros.copy()
@@ -63,25 +87,22 @@ class Taqueria():
             # "Queue vacio"
             if m == "":
                 return
-
-            self.ordenesPendientes+= 1
             # Borrar mensaje del sqs
             delete_message(m[0]['ReceiptHandle'])
             # Si llegan 300 o mas tacos no se atendera orden
             for batch in orden['orden']:
                 cantidad += batch['quantity']
                 if cantidad >= 300:
-                    # print("Orden rechazada ")
-                    self.output= [None,None,None,orden['request-id'],"rejected"]
-                    self.ordenesTerminadas +=1
+                    print("Orden rechazada ")
                     return
             # Agregar seccion answer
-            orden['Answer'] = {'start_time': str(datetime.now()), "end_time": "", "steps": []}
+            orden['Answer'] = {'start-time': "", "end_time": "", "steps": []}
         else:
             orden = ogOrden
 
         carnes = set()
         queue_lengths = []
+
         for batch in orden['orden']:
             if batch['status'] == 'open':
                 if batch['type'] == 'quesadilla':
@@ -102,10 +123,8 @@ class Taqueria():
         if len(queue_lengths) <= 0:
             orden['Answer']['end_time'] = str(datetime.now())
             orden['status'] = 'closed'
-            self.ordenesTerminadas += 1
-            self.ordenesPendientes -=1
-            self.output= [orden['Answer']['start_time'],orden['Answer']['end_time'],len(orden['Answer']['steps']),orden['request-id'],len(orden['orden']),orden['status']]
-
+            print('ORDEN TERMINADA')
+            print(orden)
             return
         max_length = min(queue_lengths)
         winner = taqueros_aux2[queue_lengths.index(max_length)]
@@ -114,114 +133,8 @@ class Taqueria():
             winner.queue_2.put(orden)
         else:
             winner.queue_1.put(orden)
-        return
-        # print(orden)
 
-    def print(self):
-        # windows
-        # sys("cls")
-        # linux ubuntu mac
-        sys("clear")
-        print(
-            "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••• TAQUERIA: “TACOS DE ELOTE” ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "	•••••••••••••••••••••••••••••                          •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "	           ORDENES:                                                      		   TAQUERO ADOBADA:                                                                               TAQUERO TRIPA Y CABEZA:                               ")
-        print(
-            "	                             			         	TRABAJANDO EN ORDEN:{0}                                                                            TRABAJANDO EN ORDEN:{1}                                                            ".format(
-                self.taquero1Info[0], self.taquero2Info[0]))
-        print(
-            "	     #PENDIENTES:{0}          			         	INGREDIENTES:                                                                                    INGREDIENTES:                                                                    ".format(
-                self.ordenesPendientes))
-        print(
-            "	•••••••••••••••••••••••••••••         			   		AGUACATE: {0}                                                                                    AGUACATE: {1}                                                                        ".format(
-                self.taquero1Info[4][0], self.taquero2Info[4][0]))
-        print(
-            "	                                    			   		CEBOLLA: {0}                                                                                       CEBOLLA: {1}                                                                           ".format(
-                self.taquero1Info[4][1], self.taquero2Info[4][1]))
-        print(
-            "	                                    			   		CILANTRO: {0}                                                                                      CILANTRO: {1}                                                                           ".format(
-                self.taquero1Info[4][2], self.taquero2Info[4][2]))
-        print(
-            "	                                    			   		SALSA: {0}                                                                                         SALSA: {1}                                                                           ".format(
-                self.taquero1Info[4][3], self.taquero2Info[4][3]))
-        print(
-            "	                             			         	 DESCANSO:{0}                                                                                     DESCANSO:{1}                                                            ".format(
-                self.taquero1Info[1], self.taquero2Info[1]))
-        print(
-            "	                             			         	 VENTILADOR:{0}                                                                                   VENTILADOR:{1}                                                            ".format(
-                self.taquero1Info[2], self.taquero2Info[2]))
-        print(
-            "	                             			         	 TORTILLAS:{0}                                                                                    TORTILLAS:{1}                                                            ".format(
-                self.taquero1Info[3], self.taquero2Info[3]))
-        print(
-            "	                             			         	 QUEUE:{0}                                                                                        QUEUE:{1}                                                            ".format(
-                self.taquero1Info[5], self.taquero2Info[5]))
-        print(
-            "	                                                       •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "	•••••••••••••••••••••••••••••                          •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "	           ORDENES:                                                      	TAQUERO ASADA Y SUADERO:                                                                       TAQUERO ASADA Y SUADERO:                               ")
-        print(
-            "	                             			         	    TRABAJANDO EN ORDEN:{0}                                                                            TRABAJANDO EN ORDEN:{1}                                                            ".format(
-                self.taquero3Info[0], self.taquero4Info[0]))
-        print(
-            "	     #TERMINADAS:{0}          			         	    INGREDIENTES:                                                                                    INGREDIENTES:                                                                    ".format(
-                self.ordenesTerminadas))
-        print(
-            "	•••••••••••••••••••••••••••••         			   		  AGUACATE: {0}                                                                                    AGUACATE: {1}                                                                        ".format(
-                self.taquero3Info[4][0], self.taquero4Info[4][0]))
-        print(
-            "	                                    			   		  CEBOLLA: {0}                                                                                       CEBOLLA: {1}                                                                           ".format(
-                self.taquero3Info[4][1], self.taquero4Info[4][1]))
-        print(
-            "	                                    			   		  CILANTRO: {0}                                                                                      CILANTRO: {1}                                                                           ".format(
-                self.taquero3Info[4][2], self.taquero4Info[4][2]))
-        print(
-            "	                                    			   		  SALSA: {0}                                                                                         SALSA: {1}                                                                           ".format(
-                self.taquero3Info[4][3], self.taquero4Info[4][3]))
-        print(
-            "	                             			         	   DESCANSO:{0}                                                                                     DESCANSO:{1}                                                            ".format(
-                self.taquero3Info[1], self.taquero4Info[1]))
-        print(
-            "	                             			         	   VENTILADOR:{0}                                                                                  VENTILADOR:{1}                                                            ".format(
-                self.taquero3Info[2], self.taquero4Info[2]))
-        print(
-            "	                             			         	   TORTILLAS:{0}                                                                                    TORTILLAS:{1}                                                            ".format(
-                self.taquero3Info[3], self.taquero4Info[3]))
-        print(
-            "	                             			         	   QUEUE:{0}                                                                                         QUEUE:{1}                                                            ".format(
-                self.taquero3Info[5], self.taquero4Info[5]))
-        print(
-            "	                                                       •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••                ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "	••••••••••••••••••••••••••••••                         •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "	           CHALANES:                                                                      QUESADILLERO:")
-        print(
-            "	        #1:  {0}                               			     	TRABAJANDO EN ORDEN:{1}    ".format(
-                self.chalan1Info, self.quesadilleroInfo[0]))
-        print(
-            "	        #2:  {0}           			     	                QUESADILLAS REALIZADAS:{1}   ".format(
-                self.chalan2Info, self.quesadilleroInfo[1]))
-        print(
-            "	••••••••••••••••••••••••••••••                         •••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print("\n")
-        print(
-            " ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        print(
-            "                                                            OUTPUT JSON:                                                                      ")
-        print(
-            "                  START TIME:                                    STEPS:{0}                   REQUEST_ID:{1}                      SUBORDENES:{2}              ".format(self.output[2],self.output[3],self.output[4]))
-        print(
-            "                  {0}                                 ".format(self.output[0]))
-        print("                  END TIME:                                    STATUS:{0}".format(self.output[5]))
-        print("		  {0}                           ".format(self.output[1]))
-        print(
-            " ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••")
-        time.sleep(1)
+        # print(orden)
 
 if __name__ == "__main__":
     mutex1 = threading.Lock()
@@ -236,12 +149,14 @@ if __name__ == "__main__":
     queuesadilla2 = Queue()
     chalan1 = Chalan()
     chalan2 = Chalan()
-    taquero1 = Taquero(queue1, queue2, ['adobada', None], chalan1, mutex1, "SaraPeka")
-    taquero2 = Taquero(queue3, queue4, ['asada', 'suadero'], chalan1, mutex1, "Almamado")
-    taquero3 = Taquero(queue3, queue4, ['asada', 'suadero'], chalan2, mutex2, "Aczino")
-    taquero4 = Taquero(queue5, queue6, ['tripa', 'cabeza'], chalan2, mutex2, "MarioTicky")
+    taquero1 = Taquero(queue1, queue2, ['adobada',None],chalan1,mutex1,"Fermin")
+    taquero2 = Taquero(queue3, queue4, ['asada','suadero'],chalan1,mutex1, "Hector Osuna")
+    taquero3 = Taquero(queue3, queue4, ['asada','suadero'],chalan2,mutex2,"David Espina")
+    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'],chalan2,mutex2, "Marcos Moroyoqui")
+
     quesadillero = Quesadillero(queuesadilla1,queuesadilla2)
+
     tacosElote = Taqueria(taquero1,taquero2,taquero3,taquero4,quesadillero)
     tacosElote.run()
-
-
+    # p = Process(target=tacosElote.run)
+    # p.start()
