@@ -57,13 +57,9 @@ class Taquero():
 
             print(f"{self} esta descansando ALV")
             if self.time1 == 0:
-                if self.name == 'Marcos Moroyoqui':
-                    print(f"{self} rest 1 {rest}")
                 self.time1 = time.time()
             rest = (time.time() - self.time1)
             # self.time1 = time.time()
-            if self.name == 'Marcos Moroyoqui':
-                print(f"{self} rest 2 {rest}")
             if self.rest + rest > 100:
                 self.rest = 100
             else:
