@@ -4,20 +4,24 @@ from queue import Queue
 
 
 class Quesadillero():
-    def __init__(self, queue1, queue2):
+    def __init__(self, queue1, queue2, name='Quesadillero'):
         self.queue_1 = queue1
         self.queue_2 = queue2
         self.using_queue_1 = True
         self.tipos = [None, None]
+        self.name = name
+
+    def __repr__(self):
+        return self.name
 
     def atender_orden(self, orden):
         if orden == None:
             print(f"{self} ya no tiene quesadillas por hacer")
             return
-        if self.using_queue_1:
-            queue = self.queue_1
-        elif not self.using_queue_1:
-            queue = self.queue_2
+        # if self.using_queue_1:
+        #     queue = self.queue_1
+        # elif not self.using_queue_1:
+        #     queue = self.queue_2
 
         orden['Answer']['start-time'] = str(datetime.now())
         for batch in orden['orden']:
