@@ -32,52 +32,47 @@ class Taqueria():
                 return None
             return taquero.queue_2.get()
 
-    def run(self):
-        lista = []
-        for i in self.taqueros:
-            lista.append(i)
-        lista.append(self.quesadillero)
 
-        # t1,t2 = self.threads()
+    def start_taquero(self,taquero):
+        print("hola")
+        while True:
+            print(f"{taquero}, Queue 1: {list(taquero.queue_1.queue)}\n{taquero}, Queue 1.2 {list(taquero.queue_2.queue)}")
+            orden = self.elegir_orden_del_taquero(taquero)
+            print(f'{taquero}, Orden 1: {orden}')
+            taquero.atender_orden(orden)
+            if orden != None:
+                if orden['status'] == 'open':
+                    self.agregar_ordenes(orden)
+
+    def mesero(self):
+        while True:
+            self.agregar_ordenes()
+
+
+    def run(self):
+        # lista = []
+        # for i in self.taqueros:
+        #     lista.append(i)
+        # lista.append(self.quesadillero)
+
+        m = Thread(target=self.mesero, args=())
+        # t1 = Thread(target=self.start_taquero, args=(self.taquero1,))
+        # t2 = Thread(target=self.start_taquero, args=(self.taquero2,))
+        # t3 = Thread(target=self.start_taquero, args=(self.taquero3,))
+        # t4 = Thread(target=self.start_taquero, args=(self.taquero4,))
+        m.start()
         # t1.start()
         # t2.start()
-        while True:
-            t1 = Thread(target=self.agregar_ordenes)
-            t2 = Thread(target=self.agregar_ordenes)
-            t1.start()
-            t2.start()
-            t1.join()
-            t2.join()
-
-            print("Queue 1: ",list(taquero1.queue_1.queue))
-            print("Queue 2: ",list(taquero1.queue_2.queue))
-            orden1 = self.elegir_orden_del_taquero(taquero1)
-            orden2 = self.elegir_orden_del_taquero(taquero2)
-            print('Orden 1: ',orden1)
-            print('Orden 2: ', orden2)
-
-            # self.elegir_queue_del_taquero(taquero1)
-            # self.elegir_queue_del_taquero(taquero2)
-            # r1 = self.taquero1.atender_orden(orden1)
-            # r2 = self.taquero2.atender_orden(orden2)
-            r1 = Thread(target=taquero1.atender_orden, args=(orden1,))
-            r2 = Thread(target=taquero2.atender_orden, args=(orden2,))
-
-            r1.start()
-            r2.start()
-            r1.join()
-            r2.join()
-
-            if orden1['status'] == 'open':
-                self.agregar_ordenes(orden1)
-            if orden2['status'] == 'open':
-                self.agregar_ordenes(orden2)
+        # t3.start()
+        # t4.start()
+        m.join()
+        # t1.join()
+        # t2.join()
+        # t3.join()
+        # t4.join()
 
 
-    def threads(self):
-        thread1 = Thread(target=self.taquero1.atender_orden,args=(self.taqueros,self.quesadillero,))
-        thread2 = Thread(target=self.taquero2.atender_orden,args=(self.taqueros,self.quesadillero,))
-        return thread1,thread2
+
     def agregar_ordenes(self,ogOrden=None):
         taqueros_aux = self.taqueros.copy()
         taqueros_aux2 = self.taqueros.copy()
@@ -134,7 +129,7 @@ class Taqueria():
         else:
             winner.queue_1.put(orden)
 
-        # print(orden)
+
 
 if __name__ == "__main__":
     mutex1 = threading.Lock()
