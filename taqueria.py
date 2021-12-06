@@ -108,10 +108,10 @@ if __name__ == "__main__":
     queuesadilla2 = Queue()
     chalan1 = Chalan()
     chalan2 = Chalan()
-    taquero1 = Taquero(queue1, queue2, ['adobada',None],chalan1,mutex1,"Taquero Adobda")
-    taquero2 = Taquero(queue3, queue4, ['asada','suadero'],chalan1,mutex1, "TAquero Asada y Suadero 1")
-    taquero3 = Taquero(queue3, queue4, ['asada','suadero'],chalan2,mutex2,"Taquero Asada y Suadero 2")
-    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'],chalan2,mutex2, "Taquero de Tripa y Cabeza")
+    taquero1 = Taquero(queue1, queue2, ['adobada',None],chalan1,mutex1,"Fermin")
+    taquero2 = Taquero(queue3, queue4, ['asada','suadero'],chalan1,mutex1, "Hector Osuna")
+    taquero3 = Taquero(queue3, queue4, ['asada','suadero'],chalan2,mutex2,"David Espina")
+    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'],chalan2,mutex2, "Marcos Moroyoqui")
 
     quesadillero = Quesadillero(queuesadilla1,queuesadilla2)
 
