@@ -54,7 +54,7 @@ class Taquero():
         rest = 0
         if orden == None:
 
-            print(f"{self} esta descansando ALV")
+            print(f"{self} esta descansando")
             if self.time1 == 0:
                 self.time1 = time.time()
             rest = (time.time() - self.time1)
