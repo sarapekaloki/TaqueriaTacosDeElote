@@ -1,10 +1,13 @@
+import threading
+
 from queue_functions import *
 from queue import Queue
-from Taquero import Taquero
-from Quesadillero import Quesadillero
+from taquero import Taquero
+from quesadillero import Quesadillero
 from threading import Thread
+from chalan import Chalan
 from multiprocessing import Process
-from Mesero import *
+
 
 class Taqueria():
     def __init__(self,taquero1,taquero2,taquero3,taquero4,quesadillero):
@@ -93,6 +96,8 @@ class Taqueria():
         # print(orden)
 
 if __name__ == "__main__":
+    mutex1 = threading.Lock()
+    mutex2 = threading.Lock()
     queue1 = Queue()
     queue2 = Queue()
     queue3 = Queue()
@@ -101,11 +106,12 @@ if __name__ == "__main__":
     queue6 = Queue()
     queuesadilla1 = Queue()
     queuesadilla2 = Queue()
-
-    taquero1 = Taquero(queue1, queue2, ['adobada',None])
-    taquero2 = Taquero(queue3, queue4, ['asada','suadero'])
-    taquero3 = Taquero(queue3, queue4, ['asada','suadero'])
-    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'])
+    chalan1 = Chalan()
+    chalan2 = Chalan()
+    taquero1 = Taquero(queue1, queue2, ['adobada',None],chalan1,mutex1,"Taquero Adobda")
+    taquero2 = Taquero(queue3, queue4, ['asada','suadero'],chalan1,mutex1, "TAquero Asada y Suadero 1")
+    taquero3 = Taquero(queue3, queue4, ['asada','suadero'],chalan2,mutex2,"Taquero Asada y Suadero 2")
+    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'],chalan2,mutex2, "Taquero de Tripa y Cabeza")
 
     quesadillero = Quesadillero(queuesadilla1,queuesadilla2)
 
