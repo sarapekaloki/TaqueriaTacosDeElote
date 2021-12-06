@@ -3,7 +3,6 @@ import threading
 from queue_functions import *
 from threading import Thread
 from queue import Queue
-# from Mesero import agregar_ordenes
 from chalan import Chalan
 
 
