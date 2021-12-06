@@ -2,7 +2,7 @@ import threading
 
 from queue_functions import *
 from queue import Queue
-from taquero_Hugo import Taquero
+from taquero import Taquero
 from quesadillero import Quesadillero
 from threading import Thread
 from chalan import Chalan
@@ -20,60 +20,94 @@ class Taqueria():
         self.taqueros = [self.taquero1,self.taquero2,self.taquero3,self.taquero4]
 
     def elegir_orden_del_taquero(self, taquero):
-        print('Eligiendo...')
 
         if taquero.using_queue_1:
             if taquero.queue_1.empty():
                 return None
-            # print(taquero1.queue_1.get())
             return taquero.queue_1.get()
         else:
             if taquero.queue_2.empty():
                 return None
             return taquero.queue_2.get()
 
-
-    def start_taquero(self,taquero):
-        print("hola")
-        while True:
-            print(f"{taquero}, Queue 1: {list(taquero.queue_1.queue)}\n{taquero}, Queue 1.2 {list(taquero.queue_2.queue)}")
-            orden = self.elegir_orden_del_taquero(taquero)
-            print(f'{taquero}, Orden 1: {orden}')
-            taquero.atender_orden(orden)
-            if orden != None:
-                if orden['status'] == 'open':
-                    self.agregar_ordenes(orden)
-
-    def mesero(self):
-        while True:
-            self.agregar_ordenes()
-
-
     def run(self):
-        # lista = []
-        # for i in self.taqueros:
-        #     lista.append(i)
-        # lista.append(self.quesadillero)
+        lista = []
+        for i in self.taqueros:
+            lista.append(i)
+        lista.append(self.quesadillero)
 
-        m = Thread(target=self.mesero, args=())
-        # t1 = Thread(target=self.start_taquero, args=(self.taquero1,))
-        # t2 = Thread(target=self.start_taquero, args=(self.taquero2,))
-        # t3 = Thread(target=self.start_taquero, args=(self.taquero3,))
-        # t4 = Thread(target=self.start_taquero, args=(self.taquero4,))
-        m.start()
-        # t1.start()
-        # t2.start()
-        # t3.start()
-        # t4.start()
-        m.join()
-        # t1.join()
-        # t2.join()
-        # t3.join()
-        # t4.join()
 
+        while True:
+            meseros_threads=[]
+            for i in range(20):
+                t1 = Thread(target=self.agregar_ordenes)
+                meseros_threads.append(t1)
+            for thread in meseros_threads:
+                thread.start()
+            for thread in meseros_threads:
+                thread.join()
+
+            print("Queue 1 de: ", taquero1,":",list(taquero1.queue_1.queue))
+            print("Queue 2 de: ", taquero1,":",list(taquero1.queue_2.queue))
+            print("Queue 1 de: ", taquero2,":",list(taquero2.queue_1.queue))
+            print("Queue 2 de: ", taquero2,":",list(taquero2.queue_2.queue))
+            print("Queue 1 de: ", taquero3,":",list(taquero3.queue_1.queue))
+            print("Queue 2 de: ", taquero3,":",list(taquero3.queue_2.queue))
+            print("Queue 1 de: ", taquero4,":",list(taquero4.queue_1.queue))
+            print("Queue 2 de: ", taquero4,":",list(taquero4.queue_2.queue))
+            print("Queue 1 de: ", quesadillero,":",list(quesadillero.queue_2.queue))
+            print("Queue 2 de: ", quesadillero,":",list(taquero4.queue_2.queue))
+            orden1 = self.elegir_orden_del_taquero(taquero1)
+            orden2 = self.elegir_orden_del_taquero(taquero2)
+            orden3 = self.elegir_orden_del_taquero(taquero3)
+            orden4 = self.elegir_orden_del_taquero(taquero4)
+            orden_quesadillas = self.elegir_orden_del_taquero(quesadillero)
+            print('Orden 1: ',orden1)
+            print('Orden 2: ', orden2)
+            print('Orden 3: ',orden3)
+            print('Orden 4: ', orden4)
+            print('Orden Quesadillas: ', orden_quesadillas)
+
+            # self.elegir_queue_del_taquero(taquero1)
+            # self.elegir_queue_del_taquero(taquero2)
+            # r1 = self.taquero1.atender_orden(orden1)
+            # r2 = self.taquero2.atender_orden(orden2)
+            r1 = Thread(target=taquero1.atender_orden, args=(orden1,))
+            r2 = Thread(target=taquero2.atender_orden, args=(orden2,))
+            r3 = Thread(target=taquero1.atender_orden, args=(orden3,))
+            r4 = Thread(target=taquero2.atender_orden, args=(orden4,))
+            r5 = Thread(target=taquero2.atender_orden, args=(orden_quesadillas,))
+
+            r1.start()
+            r2.start()
+            r3.start()
+            r4.start()
+            r5.start()
+            r1.join()
+            r2.join()
+            r3.join()
+            r4.join()
+            r5.join()
+
+            if orden1 != None and 'status' in orden1:
+                if orden1['status'] == 'open':
+                    self.agregar_ordenes(orden1)
+            if orden2 != None and 'status' in orden2:
+                if orden2['status'] == 'open':
+                    self.agregar_ordenes(orden2)
+            if orden3 != None and 'status' in orden3:
+                if orden3['status'] == 'open':
+                    self.agregar_ordenes(orden3)
+            if orden4 != None and 'status' in orden4:
+                if orden4['status'] == 'open':
+                    self.agregar_ordenes(orden4)
+            if orden_quesadillas != None and 'status' in orden_quesadillas:
+                if orden_quesadillas['status'] == 'open':
+                    self.agregar_ordenes(orden_quesadillas)
 
 
     def agregar_ordenes(self,ogOrden=None):
+
         taqueros_aux = self.taqueros.copy()
         taqueros_aux2 = self.taqueros.copy()
         if ogOrden == None:
@@ -91,7 +125,7 @@ class Taqueria():
                     print("Orden rechazada ")
                     return
             # Agregar seccion answer
-            orden['Answer'] = {'start-time':str(datetime.now()), "end_time": "", "steps": []}
+            orden['Answer'] = {'start-time': "", "end_time": "", "steps": []}
         else:
             orden = ogOrden
 
@@ -129,8 +163,6 @@ class Taqueria():
         else:
             winner.queue_1.put(orden)
 
-
-
 if __name__ == "__main__":
     mutex1 = threading.Lock()
     mutex2 = threading.Lock()
@@ -144,10 +176,10 @@ if __name__ == "__main__":
     queuesadilla2 = Queue()
     chalan1 = Chalan()
     chalan2 = Chalan()
-    taquero1 = Taquero(queue1, queue2, ['adobada',None],chalan1,mutex1,"Fermin")
-    taquero2 = Taquero(queue3, queue4, ['asada','suadero'],chalan1,mutex1, "Hector Osuna")
-    taquero3 = Taquero(queue3, queue4, ['asada','suadero'],chalan2,mutex2,"David Espina")
-    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'],chalan2,mutex2, "Marcos Moroyoqui")
+    taquero1 = Taquero(queue1, queue2, ['adobada',None],chalan1,mutex1,"Cristiano Ronaldo")
+    taquero2 = Taquero(queue3, queue4, ['asada','suadero'],chalan1,mutex1, "Jeff Bezos")
+    taquero3 = Taquero(queue3, queue4, ['asada','suadero'],chalan2,mutex2,"Jesucristo el Robot del futuro")
+    taquero4 = Taquero(queue5, queue6, ['tripa','cabeza'],chalan2,mutex2, "Gabriel Tavorin")
 
     quesadillero = Quesadillero(queuesadilla1,queuesadilla2)
 
