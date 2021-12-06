@@ -33,7 +33,7 @@ class Quesadillero():
                     sleepTime = 0
                     orden['Answer']['steps'].append(
                         {"state": "running", "action": "Doing quesadillas", "part-id": part_id})
-                    sleepTime = batch['quantity'] * 2
+                    sleepTime = batch['quantity'] * 20
                     batch['quantity2'] += batch['quantity']
                     batch['quantity'] = 0
                     # Checar si tiene carne pues la orden no esta terminada
@@ -61,7 +61,7 @@ class Quesadillero():
                     return orden
 
                 elif batch['quantity'] > 5:
-                    sleepTime = 10
+                    sleepTime = 100
                     batch['quantity'] -= 5
                     batch['quantity2'] += 5
                     time.sleep(sleepTime)
