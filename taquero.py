@@ -3,6 +3,7 @@ import threading
 from queue_functions import *
 from threading import Thread
 from queue import Queue
+# from Mesero import agregar_ordenes
 from chalan import Chalan
 
 
@@ -58,27 +59,13 @@ class Taquero():
             if self.time1 == 0:
                 self.time1 = time.time()
             rest = (time.time() - self.time1)
-            # self.time1 = time.time()
+            self.time1 = rest
             if self.rest + rest > 100:
                 self.rest = 100
             else:
                 self.rest += rest
             return
-        # if self.time1 != 0:
-        #     print(f"{self} rest 2 {rest}")
         self.time1 = 0
-
-
-        print(f" Taquero {self} haciendo {orden} ")
-        if self.using_queue_1:
-            queue = self.queue_1
-        elif not self.using_queue_1 and not self.queue_2.empty():
-            queue = self.queue_2
-        else:
-            queue = self.queue_1
-
-        # se calcula el tiempo desde la ultima vez que hizo algo
-        # time2 = time.time()
 
         # orden = queue.get()
         for batch in orden['orden']:
@@ -132,8 +119,9 @@ class Taquero():
                         self.using_queue_1 = False
 
                     # Se regresa al objeto, y la orden que se quiere enviar a otro cocinero. El objeto aqui se regresa porque se necesita
-                    # referencia a el
-                  
+                    # referencia a el, ya que se va a excluir de la lista en la funcion de agregar_ordenes en dum.py. Esto solo se envia cuando
+                    # se termino el batch. Aun falta la funcionalidad de que va a pasar cuando la orden este completamente terminada jajaja salu2
+                    # agregar_ordenes(taqueros,quesadillero,orden)
                     return orden
 
                 # El batch es MAYOR A 5 TACOS
