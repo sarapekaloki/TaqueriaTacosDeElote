@@ -91,7 +91,7 @@ class Taqueria():
                     print("Orden rechazada ")
                     return
             # Agregar seccion answer
-            orden['Answer'] = {'start-time': "", "end_time": "", "steps": []}
+            orden['Answer'] = {'start-time':str(datetime.now()), "end_time": "", "steps": []}
         else:
             orden = ogOrden
 
