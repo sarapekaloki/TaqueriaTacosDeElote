@@ -20,6 +20,7 @@ class Taquero():
         self.rest = 100  # 3 s / 100
         self.fan = 60  # 6 s / 60
         self.using_queue_1 = True
+        self.time1 = 0
 
     def __repr__(self):
         return self.name
@@ -32,6 +33,7 @@ class Taquero():
 
     def check_rest(self, rest_time):
         if self.rest <= 5:
+            print(f"{self} esta descansando ALV")
             time.sleep(3)
             self.rest += 100
         self.rest -= rest_time
@@ -50,9 +52,28 @@ class Taquero():
             pass
 
     def atender_orden(self, orden):
+        rest = 0
         if orden == None:
+
             print(f"{self} esta descansando ALV")
+            if self.time1 == 0:
+                if self.name == 'Marcos Moroyoqui':
+                    print(f"{self} rest 1 {rest}")
+                self.time1 = time.time()
+            rest = (time.time() - self.time1)
+            # self.time1 = time.time()
+            if self.name == 'Marcos Moroyoqui':
+                print(f"{self} rest 2 {rest}")
+            if self.rest + rest > 100:
+                self.rest = 100
+            else:
+                self.rest += rest
             return
+        # if self.time1 != 0:
+        #     print(f"{self} rest 2 {rest}")
+        self.time1 = 0
+
+
         print(f" Taquero {self} haciendo {orden} ")
         if self.using_queue_1:
             queue = self.queue_1
@@ -104,6 +125,7 @@ class Taquero():
 
                     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                     time.sleep(sleepTime)
+                    # self.wait(sleepTime)
 
                     # se le da el estatus de closed al batch
                     batch['status'] = 'closed'
@@ -149,6 +171,7 @@ class Taquero():
 
                     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                     time.sleep(sleepTime)
+                    # self.wait(sleepTime)
 
                     orden['Answer']['steps'].append(
                         {"state": "Running", "action": "Doing tacos", "part-id": part_id})
@@ -156,5 +179,4 @@ class Taquero():
                     orden['Answer']['steps'].append(
                         {"state": "Waiting", "action": "Waiting for taquero", "part-id": part_id})
                     self.using_queue_1 = not self.using_queue_1
-
                     return
