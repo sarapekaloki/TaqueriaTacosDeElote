@@ -132,9 +132,8 @@ class Taquero():
                         self.using_queue_1 = False
 
                     # Se regresa al objeto, y la orden que se quiere enviar a otro cocinero. El objeto aqui se regresa porque se necesita
-                    # referencia a el, ya que se va a excluir de la lista en la funcion de agregar_ordenes en dum.py. Esto solo se envia cuando
-                    # se termino el batch. Aun falta la funcionalidad de que va a pasar cuando la orden este completamente terminada jajaja salu2
-                    # agregar_ordenes(taqueros,quesadillero,orden)
+                    # referencia a el
+                  
                     return orden
 
                 # El batch es MAYOR A 5 TACOS
